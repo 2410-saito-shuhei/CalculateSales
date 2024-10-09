@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 
 public class CalculateSales {
 
@@ -37,14 +40,58 @@ public class CalculateSales {
 		}
 
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
-
-
-
+		
+        File[] files = new File("C:\\Users\\trainee0923\\Desktop\\売上集計課題").listFiles();
+        List<File> rcdFiles = new ArrayList<>();
+        Map<String, Long> Sales = new HashMap<>();
+        for(int i = 0; i < files.length ; i++) {
+        	files[i].getName();
+        	String filename = files[i].getName();
+        	if(filename.matches("^\\d{8}.rcd")) {
+        		rcdFiles.add(files[i]);
+        	}
+        }
+        
+        BufferedReader br = null;
+        for(int i = 0 ; i < rcdFiles.size(); i++) {
+        
+        	try {
+        		File file = rcdFiles.get(i);
+        		FileReader fr = new FileReader(file);
+        		br = new BufferedReader(fr);
+        	
+        		String line;
+        		List<String> newSales = new ArrayList<>();
+        		
+        		while((line = br.readLine()) != null) {
+        			System.out.println(line);
+        			newSales.add(line);
+        		}
+        		
+        		long fileSale = Long.parseLong(newSales.get(1));
+        		String d = newSales.get(0);
+        		Long saleamount = branchSales.get(d) + fileSale;
+        		branchSales.replace(newSales.get(0),saleamount);
+        		
+        	}catch(IOException e){
+        		System.out.println(UNKNOWN_ERROR);
+        		return;
+        	}finally{
+        		if(br != null) {
+        			try {
+        				br.close();
+        			}catch(IOException e){
+        				System.out.println(UNKNOWN_ERROR);
+        				return;
+        			}
+        		}
+        	}
+        }
+        
 		// 支店別集計ファイル書き込み処理
 		if(!writeFile(args[0], FILE_NAME_BRANCH_OUT, branchNames, branchSales)) {
 			return;
 		}
-
 	}
 
 	/**
