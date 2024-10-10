@@ -164,7 +164,8 @@ public class CalculateSales {
 				bw.newLine();
 			}
 		} catch (IOException e) {
-			System.out.println(e);
+			System.out.println(UNKNOWN_ERROR);
+			return false;
 		} finally {
 			if (bw != null) {
 				try {
