@@ -30,9 +30,10 @@ public class CalculateSales {
 	private static final String UNKNOWN_ERROR = "予期せぬエラーが発生しました";
 	private static final String FILE_NOT_EXIST = "定義ファイルが存在しません";
 	private static final String FILE_INVALID_FORMAT = "定義ファイルのフォーマットが不正です";
-	private static final String FILE_INVALID_CODE = "の支店コードが不正です";
+	private static final String SALE_FILE_INVALID_CODE = "の支店コードが不正です";
+	private static final String COMMODITY_FILE_INVALID_CODE = "の商品コードが不正です";
 	private static final String SALE_FILE_NOT_SEQUENCE_NUMBER = "売上ファイル名が連番になっていません";
-	private static final String SALE_FILE_INVALID_FORMAT = "のフォーマットが不正です";
+	private static final String RCD_FILE_INVALID_FORMAT = "のフォーマットが不正です";
 	private static final String SALE_AMOUNT_OVER_TEN_DIGITS = "合計金額が10桁を超えました";
 
 	/**
@@ -63,7 +64,7 @@ public class CalculateSales {
 		}
 		//商品定義ファイル読み込み処理
 		if (!readFile(args[0], FILE_NAME_COMMODITY_LST, commodityNames, commoditySales,
-				"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8}$]", "商品")) {
+				"^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8}$", "商品")) {
 			return;
 		}
 
@@ -105,12 +106,17 @@ public class CalculateSales {
 				}
 				//売上ファイルが3行か確認
 				if (contents.size() != 3) {
-					System.out.println(rcdFiles.get(i).getName() + SALE_FILE_INVALID_FORMAT);
+					System.out.println(rcdFiles.get(i).getName() + RCD_FILE_INVALID_FORMAT);
 					return;
 				}
 				//支店コードが支店定義ファイルに存在しているか確認
 				if (!branchNames.containsKey(contents.get(0))) {
-					System.out.println(rcdFiles.get(i).getName() + FILE_INVALID_CODE);
+					System.out.println(rcdFiles.get(i).getName() + SALE_FILE_INVALID_CODE);
+					return;
+				}
+				//商品コードが商品定義ファイルに存在しているか確認
+				if (!commodityNames.containsKey(contents.get(1))) {
+					System.out.println(rcdFiles.get(i).getName() + COMMODITY_FILE_INVALID_CODE);
 					return;
 				}
 				//売上ファイルの金額が数字か確認
@@ -129,6 +135,10 @@ public class CalculateSales {
 
 				//売上金額が10桁超えているか
 				if (branchSaleAmount >= 10000000000L) {
+					System.out.println(SALE_AMOUNT_OVER_TEN_DIGITS);
+					return;
+				}
+				if (commoditySaleAmount >= 10000000000L) {
 					System.out.println(SALE_AMOUNT_OVER_TEN_DIGITS);
 					return;
 				}
@@ -155,17 +165,17 @@ public class CalculateSales {
 			return;
 		}
 	}
+
 	/**
-	 * 定義ファイル読み込み処理
+	 * 支店/商品定義ファイル読み込み処理
 	 *
 	 * @param フォルダパス
 	 * @param ファイル名
-	 * @param 支店コードと支店名を保持するMap
-	 * @param 支店コードと売上金額を保持するMap
+	 * @param 支店/商品コードと支店/商品名を保持するMap
+	 * @param 支店/商品コードと支店別/商品別売上金額を保持するMap
 	 * @return 読み込み可否
 	 */
 
-	//  支店定義ファイル読み込み処理・商品定義ファイル読み込み処理のメソッド
 	private static boolean readFile(String path, String fileName, Map<String, String> names, Map<String, Long> sales,
 			String regulation, String category) {
 		BufferedReader br = null;
@@ -183,14 +193,14 @@ public class CalculateSales {
 			while ((line = br.readLine()) != null) {
 				String[] items = line.split(",");
 				//ファイルのフォーマットを確認
-				if (((items.length != 2)) || (!items[0].matches(regulation)){
+				if ((items.length != 2) || (!items[0].matches(regulation))) {
 					System.out.println(category + FILE_INVALID_FORMAT);
 					return false;
 				}
 				names.put(items[0], items[1]);
 				sales.put(items[0], 0L);
 			}
-		 } catch (IOException e) {
+		} catch (IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
 		} finally {
@@ -208,14 +218,13 @@ public class CalculateSales {
 		return true;
 	}
 
-
 	/**
-	 * 支店別集計ファイル書き込み処理
+	 * 支店/商品別集計ファイル書き込み処理
 	 *
 	 * @param フォルダパス
 	 * @param ファイル名
-	 * @param 支店コードと支店名を保持するMap
-	 * @param 支店コードと売上金額を保持するMap
+	 * @param 支店/商品コードと支店名/商品名を保持するMap
+	 * @param 支店/商品コードと支店別/商品別売上金額を保持するMap
 	 * @return 書き込み可否
 	 */
 	private static boolean writeFile(String path, String fileName, Map<String, String> names,
