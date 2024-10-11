@@ -130,14 +130,13 @@ public class CalculateSales {
 				String commodityCode = contents.get(1);
 				Long branchSaleAmount = branchSales.get(branchCode) + fileSale;
 				Long commoditySaleAmount = commoditySales.get(commodityCode) + fileSale;
-				branchSales.put(contents.get(0), branchSaleAmount);
-				commoditySales.put(contents.get(1), commoditySaleAmount);
-
 				//売上金額が10桁超えているか
 				if (branchSaleAmount >= 10000000000L || commoditySaleAmount >= 10000000000L) {
 					System.out.println(SALE_AMOUNT_OVER_TEN_DIGITS);
 					return;
 				}
+				branchSales.put(contents.get(0), branchSaleAmount);
+				commoditySales.put(contents.get(1), commoditySaleAmount);
 			} catch (IOException e) {
 				System.out.println(UNKNOWN_ERROR);
 				return;
