@@ -41,29 +41,23 @@ public class CalculateSales {
 		// 支店コードと売上金額を保持するMap
 		Map<String, Long> branchSales = new HashMap<>();
 
-		// 支店定義ファイル読み込み処理
-		if (!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
-			return;
-		}
 		//コマンド引数が1つか確認
 		if (args.length != 1) {
 			System.out.println(UNKNOWN_ERROR);
+			return;
+		}
+		// 支店定義ファイル読み込み処理
+		if (!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
 			return;
 		}
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
 		//支店売上ファイルを抽出
 		File[] files = new File(args[0]).listFiles();
 		List<File> rcdFiles = new ArrayList<>();
+		//ファイルかどうか、ファイル名が正しいか確認
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].getName().matches("^\\d{8}.rcd$")) {
+			if (files[i].isFile() || files[i].getName().matches("^\\d{8}.rcd$")) {
 				rcdFiles.add(files[i]);
-			}
-		}
-		//ファイルかどうか確認
-		for (File s : rcdFiles) {
-			if (!s.isFile() || !s.getName().matches("^\\d{8}.rcd$")) {
-				System.out.println(UNKNOWN_ERROR);
-				return;
 			}
 		}
 		//売上ファイルが連番か確認
@@ -92,14 +86,14 @@ public class CalculateSales {
 				while ((line = br.readLine()) != null) {
 					contents.add(line);
 				}
-				//支店コードが支店定義ファイルに存在しているか確認
-				if (!branchNames.containsKey(contents.get(0))) {
-					System.out.println(rcdFiles.get(i).getName() + FILE_INVALID_CODE);
-					return;
-				}
 				//売上ファイルが2行か確認
 				if (contents.size() != 2) {
 					System.out.println(rcdFiles.get(i).getName() + SALE_FILE_INVALID_FORMAT);
+					return;
+				}
+				//支店コードが支店定義ファイルに存在しているか確認
+				if (!branchNames.containsKey(contents.get(0))) {
+					System.out.println(rcdFiles.get(i).getName() + FILE_INVALID_CODE);
 					return;
 				}
 				//売上ファイルの金額が数字か確認
