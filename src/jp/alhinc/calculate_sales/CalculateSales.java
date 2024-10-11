@@ -56,7 +56,7 @@ public class CalculateSales {
 		List<File> rcdFiles = new ArrayList<>();
 		//ファイルかどうか、ファイル名が正しいか確認
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].isFile() || files[i].getName().matches("^\\d{8}.rcd$")) {
+			if (files[i].isFile() && files[i].getName().matches("^\\d{8}.rcd$")) {
 				rcdFiles.add(files[i]);
 			}
 		}
