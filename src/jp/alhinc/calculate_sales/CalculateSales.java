@@ -23,7 +23,7 @@ public class CalculateSales {
 	// 支店別集計ファイル名
 	private static final String FILE_NAME_BRANCH_OUT = "branch.out";
 
-	// 支店別集計ファイル名
+	// 商品別集計ファイル名
 	private static final String FILE_NAME_COMMODITY_OUT = "commodity.out";
 
 	// エラーメッセージ
@@ -134,11 +134,7 @@ public class CalculateSales {
 				commoditySales.put(contents.get(1), commoditySaleAmount);
 
 				//売上金額が10桁超えているか
-				if (branchSaleAmount >= 10000000000L) {
-					System.out.println(SALE_AMOUNT_OVER_TEN_DIGITS);
-					return;
-				}
-				if (commoditySaleAmount >= 10000000000L) {
+				if (branchSaleAmount >= 10000000000L || commoditySaleAmount >= 10000000000L) {
 					System.out.println(SALE_AMOUNT_OVER_TEN_DIGITS);
 					return;
 				}
