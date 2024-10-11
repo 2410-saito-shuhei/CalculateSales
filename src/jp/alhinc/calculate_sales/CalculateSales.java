@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +36,6 @@ public class CalculateSales {
 	 */
 	public static void main(String[] args) {
 
-		//コマンド引数が1つか確認
-		if (args.length != 1) {
-			System.out.println(UNKNOWN_ERROR);
-			return;
-		}
 		// 支店コードと支店名を保持するMap
 		Map<String, String> branchNames = new HashMap<>();
 		// 支店コードと売上金額を保持するMap
@@ -49,7 +45,11 @@ public class CalculateSales {
 		if (!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
 			return;
 		}
-
+		//コマンド引数が1つか確認
+		if (args.length != 1) {
+			System.out.println(UNKNOWN_ERROR);
+			return;
+		}
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
 		//支店売上ファイルを抽出
 		File[] files = new File(args[0]).listFiles();
@@ -67,6 +67,7 @@ public class CalculateSales {
 			}
 		}
 		//売上ファイルが連番か確認
+		Collections.sort(rcdFiles);
 		for (int i = 0; i < rcdFiles.size() - 1; i++) {
 
 			int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
@@ -80,9 +81,7 @@ public class CalculateSales {
 
 		//支店売上ファイル読込処理
 		BufferedReader br = null;
-
 		for (int i = 0; i < rcdFiles.size(); i++) {
-
 			try {
 				FileReader fr = new FileReader(rcdFiles.get(i));
 				br = new BufferedReader(fr);
@@ -132,7 +131,6 @@ public class CalculateSales {
 				}
 			}
 		}
-
 		// 支店別集計ファイル書き込み処理
 		if (!writeFile(args[0], FILE_NAME_BRANCH_OUT, branchNames, branchSales)) {
 			return;
@@ -151,7 +149,6 @@ public class CalculateSales {
 	private static boolean readFile(String path, String fileName, Map<String, String> branchNames,
 			Map<String, Long> branchSales) {
 		BufferedReader br = null;
-
 		try {
 			File file = new File(path, fileName);
 			//ファイルの存在チェック
@@ -161,7 +158,6 @@ public class CalculateSales {
 			}
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
-
 			String line;
 			// 一行ずつ読み込む
 			while ((line = br.readLine()) != null) {
@@ -175,7 +171,6 @@ public class CalculateSales {
 				branchNames.put(items[0], items[1]);
 				branchSales.put(items[0], 0L);
 			}
-
 		} catch (IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
@@ -208,7 +203,6 @@ public class CalculateSales {
 		// ※ここに書き込み処理を作成してください。(処理内容3-1)
 		//支店別集計ファイル書込処理
 		BufferedWriter bw = null;
-
 		try {
 			File file = new File(path, fileName);
 			FileWriter fw = new FileWriter(file);
@@ -231,8 +225,6 @@ public class CalculateSales {
 				}
 			}
 		}
-
 		return true;
 	}
-
 }
